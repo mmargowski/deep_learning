@@ -71,12 +71,14 @@ classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics =  
 # Fitting the ANN to the training set
 classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
 
-
 # --- Prediction + Model Evaluation ---
 
 # Predicting the Test set results
 y_pred = classifier.predict(X_test)
 y_pred_bool = (y_pred > 0.5)
+
+from sklearn.metrics import accuracy_score
+print('Accuracy: ', accuracy_score(y_test, y_pred_bool))
 
 # Making the Confusion Matrix
 from sklearn.metrics import confusion_matrix
