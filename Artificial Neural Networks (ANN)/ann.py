@@ -51,16 +51,19 @@ X_test = sc.transform(X_test)
 import keras
 from keras.models import Sequential
 from keras.layers import Dense
-'''
+from keras.layers import Dropout
+
 # Initialising the ANN
 classifier = Sequential()
 
-# Adding the input layer and the first hidden layer
+# Adding the input layer and the first hidden layer with dropout
 # output_dim set to avg(dependent variables (1) + independent variables(11))
 classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu', input_dim = 11))
+classifier.add(Dropout(p = 0.1))
 
-# Adding the second hidden layer
+# Adding the second hidden layer with dropout
 classifier.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu'))
+classifier.add(Dropout(p = 0.1))
 
 # Adding the output layer
 classifier.add(Dense(output_dim = 1, init = 'uniform', activation = 'sigmoid'))
@@ -84,7 +87,7 @@ new_prediction = (new_prediction > 0.5)
 # Creating the Confusion Matrix
 from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(y_test, y_pred_bool)
-'''
+
 
 # --- Evaluating, Improving and Tuning the ANN ---
 
@@ -106,5 +109,8 @@ accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, c
 mean = accuracies.mean()
 variance = accuracies.std()
 # Improving the ANN
+# Dropout Regularization to reduce overfitting if needed
+
+
 
 # Tuning the ANN
