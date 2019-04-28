@@ -37,7 +37,7 @@ X = X[:, 1:]
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
 
 # Feature Scaling
 from sklearn.preprocessing import StandardScaler
@@ -51,7 +51,7 @@ X_test = sc.transform(X_test)
 import keras
 from keras.models import Sequential
 from keras.layers import Dense
-
+'''
 # Initialising the ANN
 classifier = Sequential()
 
@@ -77,9 +77,34 @@ classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
 y_pred = classifier.predict(X_test)
 y_pred_bool = (y_pred > 0.5)
 
-from sklearn.metrics import accuracy_score
-print('Accuracy: ', accuracy_score(y_test, y_pred_bool))
+# Predict single instance
+new_prediction = classifier.predict(sc.transform(np.array([[0.0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])))
+new_prediction = (new_prediction > 0.5)
 
-# Making the Confusion Matrix
+# Creating the Confusion Matrix
 from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(y_test, y_pred_bool)
+'''
+
+# --- Evaluating, Improving and Tuning the ANN ---
+
+# Evaluating the ANN
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+from keras.models import Sequential
+from keras.layers import Dense
+def build_classifier():
+    classifier = Sequential()
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
+    classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+    classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+    return classifier
+classifier = KerasClassifier(build_fn = build_classifier, batch_size = 10, epochs = 100)
+# Using cross validation
+accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10, n_jobs = 1)
+mean = accuracies.mean()
+variance = accuracies.std()
+# Improving the ANN
+
+# Tuning the ANN
