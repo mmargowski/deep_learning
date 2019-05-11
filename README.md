@@ -2,6 +2,10 @@
 
 Different projects using deep learning techniques
 
+## Which algorithm to pick?
+![Which algorithm to pick?](https://github.com/mmargowski/deep_learning/blob/master/When%20to%20use%20which%20algorithm.png)
+
+
 ## Installation instructions:
 
 ### Linux/Mac:  
