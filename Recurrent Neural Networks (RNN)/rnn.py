@@ -76,3 +76,30 @@ regressor.fit(X_train, y_train, batch_size = 32, epochs = 100)
 
 
 # --- Making the prediction + visualising the results ---
+
+# Getting the real stock price of 2017
+dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
+real_stock_price = dataset_test.iloc[:, 1:2].values
+
+# Getting the predicted stock price of 2017
+dataset_total = pd.concat((dataset_train['Open'], dataset_test['Open']), axis=0)
+inputs = dataset_total[len(dataset_total) - len(dataset_test) - 60 : len(dataset_total)].values
+inputs = inputs.reshape(-1,1)
+inputs = sc.transform(inputs)
+X_test = []
+for i in range(60, len(inputs)):
+    X_test.append(inputs[i-60:i,0])
+X_test = np.array(X_test)
+X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1) )
+predicted_stock_price = regressor.predict(X_test)
+predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+
+# Visualising the results
+plt.plot(real_stock_price, color = 'red', label = 'Real Stock Price')
+plt.plot(predicted_stock_price, color = 'blue', label = 'Predicted Stock Price')
+plt.title('Real vs. Predicted Stock Price')
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.legend()
+plt.savefig('stock_prediction.png')
+plt.show()
