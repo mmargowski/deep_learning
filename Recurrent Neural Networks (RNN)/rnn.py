@@ -50,19 +50,27 @@ from keras.layers import Dropout
 regressor = Sequential()
 
 # Adding the first LSTM layer and some dropout regularization
-regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+regressor.add(LSTM(units = 100, return_sequences = True, input_shape = (X_train.shape[1], 1)))
 regressor.add(Dropout(0.2))
 
 # Adding the second LSTM layer and some dropout regularization
-regressor.add(LSTM(units = 50, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2))
 
 # Adding the third LSTM layer and some dropout regularization
-regressor.add(LSTM(units = 50, return_sequences = True))
+regressor.add(LSTM(units = 100, return_sequences = True))
+regressor.add(Dropout(0.2))
+
+# Adding the fourth LSTM layer and some dropout regularization
+regressor.add(LSTM(units = 100, return_sequences = True))
+regressor.add(Dropout(0.2))
+
+# Adding the fifth LSTM layer and some dropout regularization
+regressor.add(LSTM(units = 100, return_sequences = True))
 regressor.add(Dropout(0.2))
 
 # Adding the third LSTM layer and some dropout regularization
-regressor.add(LSTM(units = 50, return_sequences = False))
+regressor.add(LSTM(units = 100, return_sequences = False))
 regressor.add(Dropout(0.2))
 
 # Adding the output layer
@@ -73,7 +81,6 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # Fitting the RNN to the training set
 regressor.fit(X_train, y_train, batch_size = 32, epochs = 100)
-
 
 # --- Making the prediction + visualising the results ---
 
@@ -94,6 +101,12 @@ X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1) )
 predicted_stock_price = regressor.predict(X_test)
 predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
+# Calculating the RMSE
+import math
+from sklearn.metrics import mean_squared_error
+rmse = math.sqrt(mean_squared_error(real_stock_price, predicted_stock_price))
+average_rmse = rmse/np.mean(real_stock_price)
+
 # Visualising the results
 plt.plot(real_stock_price, color = 'red', label = 'Real Stock Price')
 plt.plot(predicted_stock_price, color = 'blue', label = 'Predicted Stock Price')
@@ -103,3 +116,36 @@ plt.ylabel('Price')
 plt.legend()
 plt.savefig('stock_prediction.png')
 plt.show()
+
+
+# Tuning the RNN by finding the best parameters
+# This might take a long time. Get some coffee.
+from keras.wrappers.scikit_learn import KerasRegressor
+from sklearn.model_selection import GridSearchCV
+from keras.models import Sequential
+from keras.layers import Dense
+def build_regressor(optimizer):
+    regressor = Sequential()
+    regressor.add(LSTM(units = 100, return_sequences = True, input_shape = (X_train.shape[1], 1)))
+    regressor.add(Dropout(0.2))
+    regressor.add(LSTM(units = 100, return_sequences = True))
+    regressor.add(Dropout(0.2))
+    regressor.add(LSTM(units = 100, return_sequences = True))
+    regressor.add(Dropout(0.2))
+    regressor.add(LSTM(units = 100, return_sequences = True))
+    regressor.add(Dropout(0.2))
+    regressor.add(LSTM(units = 100, return_sequences = True))
+    regressor.add(Dropout(0.2))
+    regressor.add(LSTM(units = 100, return_sequences = False))
+    regressor.add(Dropout(0.2))
+    regressor.add(Dense(units = 1))
+    regressor.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['accuracy'])
+    return regressor
+regressor = KerasRegressor(build_fn = build_regressor)
+parameters = {'batch_size' : [16, 32, 64],
+              'epochs' : [100, 200, 300],
+              'optimizer' : ['adam', 'rmsprop']}
+grid_search = GridSearchCV(estimator = regressor, param_grid = parameters, scoring = 'neg_mean_squared_error', cv = 10)
+grid_search = grid_search.fit(X_train, y_train)
+best_parameters = grid_search.best_params_
+best_accuracy = grid_search.best_score_
