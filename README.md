@@ -8,7 +8,7 @@ Different projects using deep learning techniques (ANN, CNN, SOM, RNN)
 
 ## Installation instructions:
 
-### Linux/Mac:  
+### Linux/Mac (Assuming you are using anaconda):  
 pip install theano  
 pip install tensorflow  
 pip install keras  
