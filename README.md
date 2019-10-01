@@ -14,7 +14,7 @@ pip install tensorflow
 pip install keras  
 conda update --all  
 
-### Windows  
+### Windows:
 conda create -n tensorflow python=3.5 anaconda  
 activate tensorflow  
 conda install theano  
