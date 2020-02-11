@@ -1,5 +1,5 @@
 # Convolutional Neural Network
-# Predicting if a images is a cat or a dog.
+# Predicting if an images is a cat or a dog.
 # Just replace the images with some other classification problem and run the CNN
 
 # Installing Theano
